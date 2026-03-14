@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Student Management System – Class Diagram</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0b0f1a; --surface: #111827; --surface2: #1a2236;
+    --border: #1e3a5f; --accent: #00d4ff; --text: #e2e8f0; --muted: #64748b;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:var(--bg); color:var(--text); font-family:'Syne',sans-serif; min-height:100vh; padding:40px 20px; }
+  body::before {
+    content:''; position:fixed; inset:0;
+    background-image: linear-gradient(rgba(0,212,255,0.03) 1px,transparent 1px), linear-gradient(90deg,rgba(0,212,255,0.03) 1px,transparent 1px);
+    background-size:40px 40px; pointer-events:none; z-index:0;
+  }
+  .wrapper { position:relative; z-index:1; max-width:1520px; margin:0 auto; }
+  header { text-align:center; margin-bottom:44px; }
+  .tag { display:inline-block; font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:3px; color:var(--accent); border:1px solid var(--accent); padding:4px 14px; border-radius:2px; margin-bottom:14px; }
+  h1 { font-size:clamp(22px,4vw,44px); font-weight:800; background:linear-gradient(135deg,#fff 30%,var(--accent)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+  .subtitle { color:var(--muted); font-family:'JetBrains Mono',monospace; font-size:12px; margin-top:8px; }
+  .section-label { font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:3px; text-transform:uppercase; color:var(--muted); margin-bottom:18px; display:flex; align-items:center; gap:12px; }
+  .section-label::after { content:''; flex:1; height:1px; background:var(--border); }
+  .card { background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:28px; margin-bottom:40px; position:relative; overflow:hidden; }
+  .card::before { content:''; position:absolute; top:0; left:0; right:0; height:2px; background:linear-gradient(90deg,var(--accent),#7c3aed); }
+  .scroll { overflow-x:auto; padding-bottom:8px; }
+  .legend { display:flex; flex-wrap:wrap; gap:18px; margin-top:24px; padding:14px 18px; background:var(--surface2); border-radius:8px; border:1px solid var(--border); font-family:'JetBrains Mono',monospace; font-size:12px; }
+  .li { display:flex; align-items:center; gap:8px; }
+  .dot { width:10px; height:10px; border-radius:50%; flex-shrink:0; }
+</style>
+</head>
+<body>
+<div class="wrapper">
+  <header>
+    <div class="tag">C++ · OOP · File Handling</div>
+    <h1>Student Management System</h1>
+    <p class="subtitle">// UML Class Diagram &nbsp;·&nbsp; 7 Classes &nbsp;·&nbsp; All attributes &amp; methods exact</p>
+  </header>
+
+  <div class="section-label">Class Diagram — All 7 Classes</div>
+  <div class="card">
+    <div class="scroll">
+
+<svg viewBox="0 0 1500 1020" width="1500" height="1020"
+     xmlns="http://www.w3.org/2000/svg"
+     font-family="JetBrains Mono, monospace" font-size="12">
+<defs>
+  <marker id="arr"       markerWidth="9" markerHeight="7" refX="8" refY="3.5" orient="auto"><polygon points="0 0,9 3.5,0 7" fill="#00d4ff"/></marker>
+  <marker id="arr-y"     markerWidth="9" markerHeight="7" refX="8" refY="3.5" orient="auto"><polygon points="0 0,9 3.5,0 7" fill="#f59e0b"/></marker>
+  <marker id="arr-g"     markerWidth="9" markerHeight="7" refX="8" refY="3.5" orient="auto"><polygon points="0 0,9 3.5,0 7" fill="#10b981"/></marker>
+  <marker id="arr-p"     markerWidth="9" markerHeight="7" refX="8" refY="3.5" orient="auto"><polygon points="0 0,9 3.5,0 7" fill="#a78bfa"/></marker>
+  <marker id="arr-r"     markerWidth="9" markerHeight="7" refX="8" refY="3.5" orient="auto"><polygon points="0 0,9 3.5,0 7" fill="#f87171"/></marker>
+  <marker id="arr-slate" markerWidth="9" markerHeight="7" refX="8" refY="3.5" orient="auto"><polygon points="0 0,9 3.5,0 7" fill="#94a3b8"/></marker>
+  <marker id="arr-sky"   markerWidth="9" markerHeight="7" refX="8" refY="3.5" orient="auto"><polygon points="0 0,9 3.5,0 7" fill="#38bdf8"/></marker>
+  <!-- open diamond for aggregation (at start of line) -->
+  <marker id="dmd-y" markerWidth="14" markerHeight="8" refX="1" refY="4" orient="auto">
+    <polygon points="1 4,7 1,13 4,7 7" fill="none" stroke="#f59e0b" stroke-width="1.5"/>
+  </marker>
+  <filter id="glow"><feGaussianBlur stdDeviation="2.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+</defs>
+
+<!-- ╔══════════════════════════════════════════════╗
+     ║  LAYOUT PLAN                                 ║
+     ║  SchoolClass : x=30,  y=300  w=250           ║
+     ║  Student     : x=400, y=290  w=240 (HUB)     ║
+     ║  Result      : x=780, y=30   w=250           ║
+     ║  Attendance  : x=780, y=360  w=270           ║
+     ║  Fees        : x=780, y=680  w=250           ║
+     ║  FileManager : x=30,  y=680  w=280           ║
+     ║  ReportGen   : x=1120,y=260  w=310           ║
+     ╚══════════════════════════════════════════════╝ -->
+
+<!-- ─────────────────────────────────────────
+     STUDENT  (hub)
+───────────────────────────────────────────── -->
+<g filter="url(#glow)">
+  <rect x="400" y="290" width="245" height="325" rx="6" fill="#0a1929" stroke="#00d4ff" stroke-width="2"/>
+  <rect x="400" y="290" width="245" height="34"  rx="6" fill="#00d4ff" fill-opacity="0.15"/>
+  <line x1="400" y1="324" x2="645" y2="324" stroke="#00d4ff" stroke-opacity="0.45" stroke-width="1"/>
+  <text x="522" y="312" text-anchor="middle" fill="#00d4ff" font-size="13" font-weight="700">Student</text>
+  <!-- attrs -->
+  <text x="414" y="342" fill="#94a3b8">- rollNumber : int</text>
+  <text x="414" y="358" fill="#94a3b8">- name : string</text>
+  <text x="414" y="374" fill="#94a3b8">- age : int</text>
+  <text x="414" y="390" fill="#94a3b8">- gender : string</text>
+  <text x="414" y="406" fill="#94a3b8">- classID : string</text>
+  <text x="414" y="422" fill="#94a3b8">- address : string</text>
+  <text x="414" y="438" fill="#94a3b8">- phone : string</text>
+  <line x1="400" y1="448" x2="645" y2="448" stroke="#1e3a5f" stroke-width="1"/>
+  <!-- methods -->
+  <text x="414" y="466" fill="#e2e8f0">+ addStudent()</text>
+  <text x="414" y="482" fill="#e2e8f0">+ updateStudent()</text>
+  <text x="414" y="498" fill="#e2e8f0">+ deleteStudent()</text>
+  <text x="414" y="514" fill="#e2e8f0">+ displayStudent()</text>
+  <text x="414" y="530" fill="#e2e8f0">+ getRollNumber()</text>
+  <text x="414" y="546" fill="#e2e8f0">+ setStudentDetails()</text>
+  <!-- file badge -->
+  <rect x="402" y="268" width="124" height="18" rx="3" fill="#00d4ff" fill-opacity="0.07" stroke="#00d4ff" stroke-width="0.8"/>
+  <text x="464" y="281" text-anchor="middle" fill="#00d4ff" font-size="10">Student.h / .cpp</text>
+</g>
+
+<!-- ─────────────────────────────────────────
+     SCHOOLCLASS
+───────────────────────────────────────────── -->
+<g filter="url(#glow)">
+  <rect x="30" y="300" width="265" height="290" rx="6" fill="#0a1929" stroke="#f59e0b" stroke-width="2"/>
+  <rect x="30" y="300" width="265" height="34"  rx="6" fill="#f59e0b" fill-opacity="0.13"/>
+  <line x1="30" y1="334" x2="295" y2="334" stroke="#f59e0b" stroke-opacity="0.4" stroke-width="1"/>
+  <text x="162" y="322" text-anchor="middle" fill="#f59e0b" font-size="13" font-weight="700">SchoolClass</text>
+  <text x="44" y="352" fill="#94a3b8">- classID : string</text>
+  <text x="44" y="368" fill="#94a3b8">- className : string</text>
+  <text x="44" y="384" fill="#94a3b8">- section : string</text>
+  <text x="44" y="400" fill="#94a3b8">- classTeacher : string</text>
+  <text x="44" y="416" fill="#94a3b8">- students : vector&lt;Student&gt;</text>
+  <line x1="30" y1="426" x2="295" y2="426" stroke="#1e3a5f" stroke-width="1"/>
+  <text x="44" y="444" fill="#e2e8f0">+ addStudentToClass()</text>
+  <text x="44" y="460" fill="#e2e8f0">+ removeStudentFromClass()</text>
+  <text x="44" y="476" fill="#e2e8f0">+ displayClassStudents()</text>
+  <text x="44" y="492" fill="#e2e8f0">+ getClassDetails()</text>
+  <rect x="32" y="278" width="108" height="18" rx="3" fill="#f59e0b" fill-opacity="0.07" stroke="#f59e0b" stroke-width="0.8"/>
+  <text x="86" y="291" text-anchor="middle" fill="#f59e0b" font-size="10">Class.h / .cpp</text>
+</g>
+
+<!-- ─────────────────────────────────────────
+     RESULT
+───────────────────────────────────────────── -->
+<g filter="url(#glow)">
+  <rect x="780" y="30" width="255" height="265" rx="6" fill="#0a1929" stroke="#10b981" stroke-width="2"/>
+  <rect x="780" y="30" width="255" height="34"  rx="6" fill="#10b981" fill-opacity="0.13"/>
+  <line x1="780" y1="64" x2="1035" y2="64" stroke="#10b981" stroke-opacity="0.4" stroke-width="1"/>
+  <text x="907" y="52" text-anchor="middle" fill="#10b981" font-size="13" font-weight="700">Result</text>
+  <text x="794" y="82" fill="#94a3b8">- rollNumber : int</text>
+  <text x="794" y="98" fill="#94a3b8">- subject : string</text>
+  <text x="794" y="114" fill="#94a3b8">- marks : int</text>
+  <text x="794" y="130" fill="#94a3b8">- grade : string</text>
+  <text x="794" y="146" fill="#94a3b8">- percentage : float</text>
+  <line x1="780" y1="156" x2="1035" y2="156" stroke="#1e3a5f" stroke-width="1"/>
+  <text x="794" y="174" fill="#e2e8f0">+ addResult()</text>
+  <text x="794" y="190" fill="#e2e8f0">+ updateResult()</text>
+  <text x="794" y="206" fill="#e2e8f0">+ calculateGrade()</text>
+  <text x="794" y="222" fill="#e2e8f0">+ calculatePercentage()</text>
+  <text x="794" y="238" fill="#e2e8f0">+ displayResult()</text>
+  <rect x="782" y="8" width="116" height="18" rx="3" fill="#10b981" fill-opacity="0.07" stroke="#10b981" stroke-width="0.8"/>
+  <text x="840" y="21" text-anchor="middle" fill="#10b981" font-size="10">Result.h / .cpp</text>
+</g>
+
+<!-- ─────────────────────────────────────────
+     ATTENDANCE
+───────────────────────────────────────────── -->
+<g filter="url(#glow)">
+  <rect x="780" y="360" width="285" height="255" rx="6" fill="#0a1929" stroke="#a78bfa" stroke-width="2"/>
+  <rect x="780" y="360" width="285" height="34"  rx="6" fill="#7c3aed" fill-opacity="0.16"/>
+  <line x1="780" y1="394" x2="1065" y2="394" stroke="#a78bfa" stroke-opacity="0.4" stroke-width="1"/>
+  <text x="922" y="382" text-anchor="middle" fill="#a78bfa" font-size="13" font-weight="700">Attendance</text>
+  <text x="794" y="412" fill="#94a3b8">- rollNumber : int</text>
+  <text x="794" y="428" fill="#94a3b8">- totalClasses : int</text>
+  <text x="794" y="444" fill="#94a3b8">- classesAttended : int</text>
+  <text x="794" y="460" fill="#94a3b8">- attendancePercentage : float</text>
+  <line x1="780" y1="470" x2="1065" y2="470" stroke="#1e3a5f" stroke-width="1"/>
+  <text x="794" y="488" fill="#e2e8f0">+ markAttendance()</text>
+  <text x="794" y="504" fill="#e2e8f0">+ updateAttendance()</text>
+  <text x="794" y="520" fill="#e2e8f0">+ calculateAttendance()</text>
+  <text x="794" y="536" fill="#e2e8f0">+ displayAttendance()</text>
+  <rect x="782" y="338" width="138" height="18" rx="3" fill="#7c3aed" fill-opacity="0.07" stroke="#a78bfa" stroke-width="0.8"/>
+  <text x="851" y="351" text-anchor="middle" fill="#a78bfa" font-size="10">Attendance.h / .cpp</text>
+</g>
+
+<!-- ─────────────────────────────────────────
+     FEES
+───────────────────────────────────────────── -->
+<g filter="url(#glow)">
+  <rect x="780" y="686" width="255" height="265" rx="6" fill="#0a1929" stroke="#f87171" stroke-width="2"/>
+  <rect x="780" y="686" width="255" height="34"  rx="6" fill="#ef4444" fill-opacity="0.13"/>
+  <line x1="780" y1="720" x2="1035" y2="720" stroke="#f87171" stroke-opacity="0.4" stroke-width="1"/>
+  <text x="907" y="708" text-anchor="middle" fill="#f87171" font-size="13" font-weight="700">Fees</text>
+  <text x="794" y="738" fill="#94a3b8">- rollNumber : int</text>
+  <text x="794" y="754" fill="#94a3b8">- totalFees : float</text>
+  <text x="794" y="770" fill="#94a3b8">- paidFees : float</text>
+  <text x="794" y="786" fill="#94a3b8">- remainingFees : float</text>
+  <text x="794" y="802" fill="#94a3b8">- lastPaymentDate : string</text>
+  <line x1="780" y1="812" x2="1035" y2="812" stroke="#1e3a5f" stroke-width="1"/>
+  <text x="794" y="830" fill="#e2e8f0">+ payFees()</text>
+  <text x="794" y="846" fill="#e2e8f0">+ calculateRemainingFees()</text>
+  <text x="794" y="862" fill="#e2e8f0">+ displayFeesStatus()</text>
+  <text x="794" y="878" fill="#e2e8f0">+ updateFees()</text>
+  <rect x="782" y="664" width="100" height="18" rx="3" fill="#ef4444" fill-opacity="0.07" stroke="#f87171" stroke-width="0.8"/>
+  <text x="832" y="677" text-anchor="middle" fill="#f87171" font-size="10">Fees.h / .cpp</text>
+</g>
+
+<!-- ─────────────────────────────────────────
+     FILEMANAGER
+───────────────────────────────────────────── -->
+<g filter="url(#glow)">
+  <rect x="30" y="700" width="305" height="270" rx="6" fill="#0a1929" stroke="#94a3b8" stroke-width="2"/>
+  <rect x="30" y="700" width="305" height="34"  rx="6" fill="#475569" fill-opacity="0.22"/>
+  <line x1="30" y1="734" x2="335" y2="734" stroke="#94a3b8" stroke-opacity="0.4" stroke-width="1"/>
+  <text x="182" y="722" text-anchor="middle" fill="#cbd5e1" font-size="13" font-weight="700">FileManager</text>
+  <text x="44" y="752" fill="#94a3b8">- studentFile : string</text>
+  <text x="44" y="768" fill="#94a3b8">- resultFile : string</text>
+  <text x="44" y="784" fill="#94a3b8">- attendanceFile : string</text>
+  <text x="44" y="800" fill="#94a3b8">- feesFile : string</text>
+  <line x1="30" y1="810" x2="335" y2="810" stroke="#1e3a5f" stroke-width="1"/>
+  <text x="44" y="828" fill="#e2e8f0">+ saveStudent() / readStudents()</text>
+  <text x="44" y="844" fill="#e2e8f0">+ saveResult() / readResults()</text>
+  <text x="44" y="860" fill="#e2e8f0">+ saveAttendance() / readAttendance()</text>
+  <text x="44" y="876" fill="#e2e8f0">+ saveFees() / readFees()</text>
+  <text x="44" y="892" fill="#e2e8f0">+ deleteRecord(rollNumber)</text>
+  <text x="44" y="908" fill="#e2e8f0">+ updateRecord()</text>
+  <rect x="32" y="678" width="152" height="18" rx="3" fill="#475569" fill-opacity="0.12" stroke="#94a3b8" stroke-width="0.8"/>
+  <text x="108" y="691" text-anchor="middle" fill="#94a3b8" font-size="10">FileManager.h / .cpp</text>
+</g>
+
+<!-- ─────────────────────────────────────────
+     REPORTGENERATOR
+───────────────────────────────────────────── -->
+<g filter="url(#glow)">
+  <rect x="1120" y="260" width="350" height="320" rx="6" fill="#0a1929" stroke="#38bdf8" stroke-width="2"/>
+  <rect x="1120" y="260" width="350" height="34"  rx="6" fill="#0ea5e9" fill-opacity="0.14"/>
+  <line x1="1120" y1="294" x2="1470" y2="294" stroke="#38bdf8" stroke-opacity="0.4" stroke-width="1"/>
+  <text x="1295" y="282" text-anchor="middle" fill="#38bdf8" font-size="13" font-weight="700">ReportGenerator</text>
+  <text x="1134" y="312" fill="#94a3b8">- students : vector&lt;Student&gt;</text>
+  <text x="1134" y="328" fill="#94a3b8">- results : vector&lt;Result&gt;</text>
+  <text x="1134" y="344" fill="#94a3b8">- attendanceRecords : vector&lt;Attendance&gt;</text>
+  <text x="1134" y="360" fill="#94a3b8">- feesRecords : vector&lt;Fees&gt;</text>
+  <line x1="1120" y1="370" x2="1470" y2="370" stroke="#1e3a5f" stroke-width="1"/>
+  <text x="1134" y="388" fill="#e2e8f0">+ generateStudentReport(rollNumber)</text>
+  <text x="1134" y="404" fill="#e2e8f0">+ generateClassReport(classID)</text>
+  <text x="1134" y="420" fill="#e2e8f0">+ generateAttendanceReport(rollNumber)</text>
+  <text x="1134" y="436" fill="#e2e8f0">+ generateFeesReport(rollNumber)</text>
+  <text x="1134" y="452" fill="#e2e8f0">+ generateResultReport(rollNumber)</text>
+  <text x="1134" y="468" fill="#e2e8f0">+ generateFullSchoolReport()</text>
+  <rect x="1122" y="238" width="176" height="18" rx="3" fill="#0ea5e9" fill-opacity="0.07" stroke="#38bdf8" stroke-width="0.8"/>
+  <text x="1210" y="251" text-anchor="middle" fill="#38bdf8" font-size="10">ReportGenerator.h / .cpp</text>
+</g>
+
+<!-- ═══════════════════════════════════════════
+     RELATIONSHIPS
+═══════════════════════════════════════════ -->
+
+<!-- 1. SchoolClass <>──── Student   (aggregation, 1 to *)
+         SchoolClass right=295, y≈445 (mid methods)
+         Student left=400, y≈450 -->
+<line x1="295" y1="452" x2="398" y2="452"
+      stroke="#f59e0b" stroke-width="2"
+      marker-start="url(#dmd-y)" marker-end="url(#arr-y)"/>
+<text x="302" y="446" fill="#f59e0b" font-size="11">1</text>
+<text x="374" y="446" fill="#f59e0b" font-size="11">*</text>
+
+<!-- 2. Student ──── Result   (Student right=645, Result left=780)
+         route: go up from Student top at y≈290, across to Result -->
+<polyline points="522,290 522,162 778,162"
+      fill="none" stroke="#10b981" stroke-width="2"
+      marker-end="url(#arr-g)"/>
+<text x="538" y="284" fill="#10b981" font-size="10">1</text>
+<text x="752" y="155" fill="#10b981" font-size="10">*</text>
+<text x="630" y="153" fill="#10b981" font-size="10" font-weight="600">has</text>
+
+<!-- 3. Student ──── Attendance   (Student right=645, Attendance left=780) -->
+<line x1="645" y1="490" x2="778" y2="490"
+      fill="none" stroke="#a78bfa" stroke-width="2"
+      marker-end="url(#arr-p)"/>
+<text x="652" y="484" fill="#a78bfa" font-size="10">1</text>
+<text x="756" y="484" fill="#a78bfa" font-size="10">1</text>
+<text x="682" y="477" fill="#a78bfa" font-size="10" font-weight="600">has</text>
+
+<!-- 4. Student ──── Fees   (route down from Student bottom y=615) -->
+<polyline points="522,615 522,830 778,830"
+      fill="none" stroke="#f87171" stroke-width="2"
+      marker-end="url(#arr-r)"/>
+<text x="538" y="607" fill="#f87171" font-size="10">1</text>
+<text x="752" y="823" fill="#f87171" font-size="10">1</text>
+<text x="620" y="823" fill="#f87171" font-size="10" font-weight="600">has</text>
+
+<!-- 5. FileManager ---> Student  (dashed uses)
+         FileManager top center x=182, y=700
+         Student bottom center x=522, y=615 -->
+<polyline points="182,700 182,650 522,650 522,617"
+      fill="none" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="7,4"
+      marker-end="url(#arr-slate)"/>
+<text x="340" y="643" fill="#94a3b8" font-size="10" text-anchor="middle">«uses»</text>
+
+<!-- 6. FileManager ---> Result (dashed) -->
+<polyline points="335,740 720,740 720,162 778,162"
+      fill="none" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="7,4"
+      marker-end="url(#arr-slate)"/>
+
+<!-- 7. FileManager ---> Attendance (dashed) -->
+<polyline points="335,780 740,780 740,490 778,490"
+      fill="none" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="7,4"
+      marker-end="url(#arr-slate)"/>
+
+<!-- 8. FileManager ---> Fees (dashed) -->
+<polyline points="335,820 760,820 760,830 778,830"
+      fill="none" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="7,4"
+      marker-end="url(#arr-slate)"/>
+
+<!-- 9. ReportGenerator ---> Student (dashed)
+         RG left=1120, y=340
+         Student right=645, y=420 -->
+<polyline points="1120,350 1080,350 1080,260 645,260 645,290"
+      fill="none" stroke="#38bdf8" stroke-width="1.5" stroke-dasharray="7,4"
+      marker-end="url(#arr-sky)"/>
+<text x="860" y="252" fill="#38bdf8" font-size="10" text-anchor="middle">«uses»</text>
+
+<!-- 10. ReportGenerator ---> Result (dashed)
+          RG left=1120, y=390
+          Result right=1035, y=162 -->
+<polyline points="1120,400 1090,400 1090,162 1037,162"
+      fill="none" stroke="#38bdf8" stroke-width="1.5" stroke-dasharray="7,4"
+      marker-end="url(#arr-sky)"/>
+
+<!-- 11. ReportGenerator ---> Attendance (dashed)
+          RG left=1120, y=430
+          Attendance right=1065, y=490 -->
+<line x1="1120" y1="440" x2="1067" y2="490"
+      fill="none" stroke="#38bdf8" stroke-width="1.5" stroke-dasharray="7,4"
+      marker-end="url(#arr-sky)"/>
+
+<!-- 12. ReportGenerator ---> Fees (dashed)
+          RG left=1120, y=470
+          Fees right=1035, y=830 -->
+<polyline points="1120,480 1100,480 1100,830 1037,830"
+      fill="none" stroke="#38bdf8" stroke-width="1.5" stroke-dasharray="7,4"
+      marker-end="url(#arr-sky)"/>
+
+<!-- ═══ MULTIPLICITY CALLOUTS ═══ -->
+<!-- Already done inline near each arrow -->
+
+</svg>
+    </div>
+
+    <!-- LEGEND -->
+    <div class="legend">
+      <div class="li">
+        <svg width="46" height="14"><line x1="2" y1="7" x2="30" y2="7" stroke="#f59e0b" stroke-width="2"/><polygon points="2,4 8,7 2,10" fill="none" stroke="#f59e0b" stroke-width="1.5"/><polygon points="30,4 40,7 30,10" fill="#f59e0b"/></svg>
+        Aggregation (contains)
+      </div>
+      <div class="li">
+        <svg width="46" height="14"><line x1="2" y1="7" x2="36" y2="7" stroke="#10b981" stroke-width="2"/><polygon points="28,4 38,7 28,10" fill="#10b981"/></svg>
+        Association (has)
+      </div>
+      <div class="li">
+        <svg width="46" height="14"><line x1="2" y1="7" x2="36" y2="7" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="6,3"/><polygon points="28,4 38,7 28,10" fill="#94a3b8"/></svg>
+        Dependency «uses»
+      </div>
+      <div class="li"><div class="dot" style="background:#00d4ff"></div>Student</div>
+      <div class="li"><div class="dot" style="background:#f59e0b"></div>SchoolClass</div>
+      <div class="li"><div class="dot" style="background:#10b981"></div>Result</div>
+      <div class="li"><div class="dot" style="background:#a78bfa"></div>Attendance</div>
+      <div class="li"><div class="dot" style="background:#f87171"></div>Fees</div>
+      <div class="li"><div class="dot" style="background:#94a3b8"></div>FileManager</div>
+      <div class="li"><div class="dot" style="background:#38bdf8"></div>ReportGenerator</div>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

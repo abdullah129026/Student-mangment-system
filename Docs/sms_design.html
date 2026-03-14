@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Student Management System – Design Blueprint</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0b0f1a;
+    --surface: #111827;
+    --surface2: #1a2236;
+    --border: #1e3a5f;
+    --accent: #00d4ff;
+    --accent2: #7c3aed;
+    --accent3: #10b981;
+    --accent4: #f59e0b;
+    --text: #e2e8f0;
+    --muted: #64748b;
+    --red: #ef4444;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Syne', sans-serif;
+    min-height: 100vh;
+    padding: 40px 20px;
+  }
+
+  /* Grid background */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(0,212,255,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,212,255,0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .wrapper { position: relative; z-index: 1; max-width: 1300px; margin: 0 auto; }
+
+  /* Header */
+  header {
+    text-align: center;
+    margin-bottom: 56px;
+  }
+  .tag {
+    display: inline-block;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 3px;
+    color: var(--accent);
+    border: 1px solid var(--accent);
+    padding: 4px 14px;
+    border-radius: 2px;
+    margin-bottom: 16px;
+    text-transform: uppercase;
+  }
+  h1 {
+    font-size: clamp(28px, 5vw, 52px);
+    font-weight: 800;
+    line-height: 1.1;
+    background: linear-gradient(135deg, #fff 30%, var(--accent));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .subtitle {
+    color: var(--muted);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    margin-top: 10px;
+    letter-spacing: 1px;
+  }
+
+  /* Sections */
+  .section-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .section-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  /* ─── FILE STRUCTURE ─── */
+  .file-tree-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 32px;
+    margin-bottom: 48px;
+    position: relative;
+    overflow: hidden;
+  }
+  .file-tree-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+  }
+
+  .tree-title {
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 24px;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .tree-title .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); display: inline-block; }
+
+  .tree {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    line-height: 2;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0 48px;
+  }
+
+  @media (max-width: 700px) { .tree { grid-template-columns: 1fr; } }
+
+  .tree-item { display: flex; align-items: baseline; gap: 8px; }
+  .tree-indent0 { padding-left: 0; }
+  .tree-indent1 { padding-left: 24px; }
+  .tree-indent2 { padding-left: 48px; }
+  .tree-indent3 { padding-left: 72px; }
+
+  .ti-folder { color: var(--accent4); }
+  .ti-root   { color: var(--accent); font-weight: 700; }
+  .ti-header { color: var(--accent); }
+  .ti-cpp    { color: var(--accent3); }
+  .ti-main   { color: var(--red); }
+  .ti-data   { color: #a78bfa; }
+  .ti-make   { color: var(--accent4); }
+  .ti-comment{ color: var(--muted); font-size: 11px; margin-left: 4px; }
+
+  .branch { color: var(--muted); user-select: none; }
+
+  /* ─── CLASS DIAGRAM ─── */
+  .diagram-wrap {
+    overflow-x: auto;
+    padding-bottom: 12px;
+  }
+
+  svg.diagram {
+    display: block;
+    min-width: 900px;
+    width: 100%;
+    height: auto;
+  }
+
+  /* ─── Legend ─── */
+  .legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    margin-top: 32px;
+    padding: 20px 24px;
+    background: var(--surface2);
+    border-radius: 8px;
+    border: 1px solid var(--border);
+  }
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--text);
+  }
+  .legend-line {
+    width: 32px;
+    height: 2px;
+  }
+  .legend-arrow {
+    width: 32px;
+    height: 0;
+    border-top: 2px solid;
+    position: relative;
+  }
+</style>
+</head>
+<body>
+<div class="wrapper">
+
+  <!-- HEADER -->
+  <header>
+    <div class="tag">C++ Beginner Project</div>
+    <h1>Student Management System</h1>
+    <p class="subtitle">// File Structure &nbsp;+&nbsp; Class Diagram &nbsp;·&nbsp; File-Based &nbsp;·&nbsp; OOP &nbsp;·&nbsp; CRUD</p>
+  </header>
+
+  <!-- FILE STRUCTURE -->
+  <div class="section-label">01 &nbsp; Project File Structure</div>
+  <div class="file-tree-card">
+    <div class="tree-title"><span class="dot"></span> Directory Layout</div>
+    <div class="tree">
+
+      <!-- LEFT COLUMN -->
+      <div>
+        <div class="tree-item tree-indent0"><span class="branch">📁</span><span class="ti-root">StudentMS/</span></div>
+        <div class="tree-item tree-indent1"><span class="branch">├─</span><span class="ti-folder">include/</span><span class="ti-comment">// all .h headers</span></div>
+        <div class="tree-item tree-indent2"><span class="branch">│ ├─</span><span class="ti-header">Student.h</span></div>
+        <div class="tree-item tree-indent2"><span class="branch">│ ├─</span><span class="ti-header">Class.h</span></div>
+        <div class="tree-item tree-indent2"><span class="branch">│ ├─</span><span class="ti-header">Result.h</span></div>
+        <div class="tree-item tree-indent2"><span class="branch">│ ├─</span><span class="ti-header">Attendance.h</span></div>
+        <div class="tree-item tree-indent2"><span class="branch">│ ├─</span><span class="ti-header">Fees.h</span></div>
+        <div class="tree-item tree-indent2"><span class="branch">│ ├─</span><span class="ti-header">FileManager.h</span></div>
+        <div class="tree-item tree-indent2"><span class="branch">│ └─</span><span class="ti-header">ReportGenerator.h</span></div>
+        <div class="tree-item tree-indent1"><span class="branch">├─</span><span class="ti-folder">src/</span><span class="ti-comment">// all .cpp implementations</span></div>
+        <div class="tree-item tree-indent2"><span class="branch">│ ├─</span><span class="ti-cpp">Student.cpp</span></div>
+        <div class="tree-item tree-indent2"><span class="branch">│ ├─</span><span class="ti-cpp">Class.cpp</span></div>
+        <div class="tree-item tree-indent2"><span class="branch">│ ├─</span><span class="ti-cpp">Result.cpp</span></div>
+        <div class="tree-item tree-indent2"><span class="branch">│ ├─</span><span class="ti-cpp">Attendance.cpp</span></div>
+        <div class="tree-item tree-indent2"><span class="branch">│ ├─</span><span class="ti-cpp">Fees.cpp</span></div>
+        <div class="tree-item tree-indent2"><span class="branch">│ ├─</span><span class="ti-cpp">FileManager.cpp</span></div>
+        <div class="tree-item tree-indent2"><span class="branch">│ └─</span><span class="ti-cpp">ReportGenerator.cpp</span></div>
+      </div>
+
+      <!-- RIGHT COLUMN -->
+      <div>
+        <div class="tree-item tree-indent0"><span class="ti-comment">&nbsp;</span></div>
+        <div class="tree-item tree-indent1"><span class="branch">├─</span><span class="ti-folder">data/</span><span class="ti-comment">// binary/txt data files</span></div>
+        <div class="tree-item tree-indent2"><span class="branch">│ ├─</span><span class="ti-data">students.dat</span></div>
+        <div class="tree-item tree-indent2"><span class="branch">│ ├─</span><span class="ti-data">classes.dat</span></div>
+        <div class="tree-item tree-indent2"><span class="branch">│ ├─</span><span class="ti-data">results.dat</span></div>
+        <div class="tree-item tree-indent2"><span class="branch">│ ├─</span><span class="ti-data">attendance.dat</span></div>
+        <div class="tree-item tree-indent2"><span class="branch">│ └─</span><span class="ti-data">fees.dat</span></div>
+        <div class="tree-item tree-indent1"><span class="branch">├─</span><span class="ti-folder">reports/</span><span class="ti-comment">// generated .txt reports</span></div>
+        <div class="tree-item tree-indent2"><span class="branch">│ ├─</span><span class="ti-data">result_report.txt</span></div>
+        <div class="tree-item tree-indent2"><span class="branch">│ ├─</span><span class="ti-data">attendance_report.txt</span></div>
+        <div class="tree-item tree-indent2"><span class="branch">│ └─</span><span class="ti-data">fees_report.txt</span></div>
+        <div class="tree-item tree-indent1"><span class="branch">├─</span><span class="ti-main">main.cpp</span><span class="ti-comment">// entry point + menu</span></div>
+        <div class="tree-item tree-indent1"><span class="branch">└─</span><span class="ti-make">Makefile</span><span class="ti-comment">// build script</span></div>
+        <div style="margin-top:20px; padding: 12px 16px; background: #0b1929; border-left: 3px solid var(--accent); border-radius: 4px;">
+          <div style="font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--muted);">// 7 classes = 7 .h + 7 .cpp files</div>
+          <div style="font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--muted); margin-top:4px;">// main.cpp only handles menu + flow</div>
+          <div style="font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--muted); margin-top:4px;">// data/ auto-created on first run</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CLASS DIAGRAM -->
+  <div class="section-label">02 &nbsp; Class Diagram</div>
+  <div class="file-tree-card">
+    <div class="tree-title"><span class="dot"></span> UML Class Relationships</div>
+    <div class="diagram-wrap">
+
+<svg class="diagram" viewBox="0 0 1100 750" xmlns="http://www.w3.org/2000/svg" font-family="JetBrains Mono, monospace">
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#00d4ff"/>
+    </marker>
+    <marker id="arrow-green" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#10b981"/>
+    </marker>
+    <marker id="arrow-purple" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#7c3aed"/>
+    </marker>
+    <marker id="diamond" markerWidth="10" markerHeight="10" refX="1" refY="5" orient="auto">
+      <polygon points="0 5, 5 0, 10 5, 5 10" fill="#f59e0b" stroke="#f59e0b"/>
+    </marker>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="2" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+
+  <!-- ═══════════════ CLASS BOXES ═══════════════ -->
+
+  <!-- Student (center-left) -->
+  <g filter="url(#glow)">
+    <rect x="30" y="260" width="220" height="220" rx="6" fill="#0f1e35" stroke="#00d4ff" stroke-width="1.5"/>
+    <rect x="30" y="260" width="220" height="36" rx="6" fill="#00d4ff" fill-opacity="0.15"/>
+    <rect x="30" y="296" width="220" height="1" fill="#00d4ff" fill-opacity="0.4"/>
+    <text x="140" y="283" text-anchor="middle" fill="#00d4ff" font-size="13" font-weight="700">Student</text>
+    <!-- attributes -->
+    <text x="44" y="320" fill="#94a3b8" font-size="11">- rollNumber : int</text>
+    <text x="44" y="338" fill="#94a3b8" font-size="11">- name : string</text>
+    <text x="44" y="356" fill="#94a3b8" font-size="11">- age : int</text>
+    <text x="44" y="374" fill="#94a3b8" font-size="11">- className : string</text>
+    <text x="44" y="392" fill="#94a3b8" font-size="11">- guardianName : string</text>
+    <text x="44" y="410" fill="#94a3b8" font-size="11">- contact : string</text>
+    <rect x="30" y="418" width="220" height="1" fill="#1e3a5f"/>
+    <!-- methods -->
+    <text x="44" y="436" fill="#e2e8f0" font-size="11">+ getInfo() : void</text>
+    <text x="44" y="454" fill="#e2e8f0" font-size="11">+ setInfo(...) : void</text>
+    <text x="44" y="472" fill="#e2e8f0" font-size="11">+ getRollNumber() : int</text>
+  </g>
+
+  <!-- Class (top center) -->
+  <g filter="url(#glow)">
+    <rect x="390" y="20" width="220" height="210" rx="6" fill="#0f1e35" stroke="#f59e0b" stroke-width="1.5"/>
+    <rect x="390" y="20" width="220" height="36" rx="6" fill="#f59e0b" fill-opacity="0.15"/>
+    <rect x="390" y="56" width="220" height="1" fill="#f59e0b" fill-opacity="0.4"/>
+    <text x="500" y="43" text-anchor="middle" fill="#f59e0b" font-size="13" font-weight="700">SchoolClass</text>
+    <text x="404" y="78" fill="#94a3b8" font-size="11">- className : string</text>
+    <text x="404" y="96" fill="#94a3b8" font-size="11">- section : char</text>
+    <text x="404" y="114" fill="#94a3b8" font-size="11">- teacherName : string</text>
+    <text x="404" y="132" fill="#94a3b8" font-size="11">- studentRolls : int[]</text>
+    <rect x="390" y="142" width="220" height="1" fill="#1e3a5f"/>
+    <text x="404" y="162" fill="#e2e8f0" font-size="11">+ addClass() : void</text>
+    <text x="404" y="180" fill="#e2e8f0" font-size="11">+ getStudentList() : void</text>
+    <text x="404" y="198" fill="#e2e8f0" font-size="11">+ searchStudent(roll) : bool</text>
+    <text x="404" y="216" fill="#e2e8f0" font-size="11">+ removeStudent(roll) : bool</text>
+  </g>
+
+  <!-- Result -->
+  <g filter="url(#glow)">
+    <rect x="390" y="280" width="220" height="210" rx="6" fill="#0f1e35" stroke="#10b981" stroke-width="1.5"/>
+    <rect x="390" y="280" width="220" height="36" rx="6" fill="#10b981" fill-opacity="0.15"/>
+    <rect x="390" y="316" width="220" height="1" fill="#10b981" fill-opacity="0.4"/>
+    <text x="500" y="303" text-anchor="middle" fill="#10b981" font-size="13" font-weight="700">Result</text>
+    <text x="404" y="338" fill="#94a3b8" font-size="11">- rollNumber : int</text>
+    <text x="404" y="356" fill="#94a3b8" font-size="11">- marks[5] : float</text>
+    <text x="404" y="374" fill="#94a3b8" font-size="11">- subjects[5] : string</text>
+    <text x="404" y="392" fill="#94a3b8" font-size="11">- totalMarks : float</text>
+    <text x="404" y="410" fill="#94a3b8" font-size="11">- grade : char</text>
+    <rect x="390" y="418" width="220" height="1" fill="#1e3a5f"/>
+    <text x="404" y="438" fill="#e2e8f0" font-size="11">+ calcTotal() : float</text>
+    <text x="404" y="456" fill="#e2e8f0" font-size="11">+ assignGrade() : char</text>
+    <text x="404" y="474" fill="#e2e8f0" font-size="11">+ display() : void</text>
+  </g>
+
+  <!-- Attendance -->
+  <g filter="url(#glow)">
+    <rect x="390" y="540" width="220" height="190" rx="6" fill="#0f1e35" stroke="#7c3aed" stroke-width="1.5"/>
+    <rect x="390" y="540" width="220" height="36" rx="6" fill="#7c3aed" fill-opacity="0.15"/>
+    <rect x="390" y="576" width="220" height="1" fill="#7c3aed" fill-opacity="0.4"/>
+    <text x="500" y="563" text-anchor="middle" fill="#a78bfa" font-size="13" font-weight="700">Attendance</text>
+    <text x="404" y="598" fill="#94a3b8" font-size="11">- rollNumber : int</text>
+    <text x="404" y="616" fill="#94a3b8" font-size="11">- totalDays : int</text>
+    <text x="404" y="634" fill="#94a3b8" font-size="11">- presentDays : int</text>
+    <text x="404" y="652" fill="#94a3b8" font-size="11">- percentage : float</text>
+    <rect x="390" y="660" width="220" height="1" fill="#1e3a5f"/>
+    <text x="404" y="680" fill="#e2e8f0" font-size="11">+ markPresent() : void</text>
+    <text x="404" y="698" fill="#e2e8f0" font-size="11">+ calcPercentage() : float</text>
+    <text x="404" y="716" fill="#e2e8f0" font-size="11">+ display() : void</text>
+  </g>
+
+  <!-- Fees -->
+  <g filter="url(#glow)">
+    <rect x="760" y="260" width="220" height="210" rx="6" fill="#0f1e35" stroke="#ef4444" stroke-width="1.5"/>
+    <rect x="760" y="260" width="220" height="36" rx="6" fill="#ef4444" fill-opacity="0.15"/>
+    <rect x="760" y="296" width="220" height="1" fill="#ef4444" fill-opacity="0.4"/>
+    <text x="870" y="283" text-anchor="middle" fill="#f87171" font-size="13" font-weight="700">Fees</text>
+    <text x="774" y="318" fill="#94a3b8" font-size="11">- rollNumber : int</text>
+    <text x="774" y="336" fill="#94a3b8" font-size="11">- totalFees : float</text>
+    <text x="774" y="354" fill="#94a3b8" font-size="11">- paidAmount : float</text>
+    <text x="774" y="372" fill="#94a3b8" font-size="11">- pendingAmount : float</text>
+    <text x="774" y="390" fill="#94a3b8" font-size="11">- dueDate : string</text>
+    <rect x="760" y="398" width="220" height="1" fill="#1e3a5f"/>
+    <text x="774" y="418" fill="#e2e8f0" font-size="11">+ payFees(amount) : void</text>
+    <text x="774" y="436" fill="#e2e8f0" font-size="11">+ calcPending() : float</text>
+    <text x="774" y="454" fill="#e2e8f0" font-size="11">+ display() : void</text>
+  </g>
+
+  <!-- FileManager -->
+  <g filter="url(#glow)">
+    <rect x="760" y="20" width="220" height="210" rx="6" fill="#0f1e35" stroke="#64748b" stroke-width="1.5"/>
+    <rect x="760" y="20" width="220" height="36" rx="6" fill="#64748b" fill-opacity="0.25"/>
+    <rect x="760" y="56" width="220" height="1" fill="#64748b" fill-opacity="0.6"/>
+    <text x="870" y="43" text-anchor="middle" fill="#cbd5e1" font-size="13" font-weight="700">FileManager</text>
+    <text x="774" y="78" fill="#94a3b8" font-size="11">- filePath : string</text>
+    <text x="774" y="96" fill="#94a3b8" font-size="11">- fileMode : ios::openmode</text>
+    <rect x="760" y="106" width="220" height="1" fill="#1e3a5f"/>
+    <text x="774" y="126" fill="#e2e8f0" font-size="11">+ writeRecord(obj) : bool</text>
+    <text x="774" y="144" fill="#e2e8f0" font-size="11">+ readRecord(roll) : bool</text>
+    <text x="774" y="162" fill="#e2e8f0" font-size="11">+ updateRecord(obj) : bool</text>
+    <text x="774" y="180" fill="#e2e8f0" font-size="11">+ deleteRecord(roll) : bool</text>
+    <text x="774" y="198" fill="#e2e8f0" font-size="11">+ readAll() : vector</text>
+    <text x="774" y="216" fill="#e2e8f0" font-size="11">+ fileExists() : bool</text>
+  </g>
+
+  <!-- ReportGenerator -->
+  <g filter="url(#glow)">
+    <rect x="760" y="510" width="220" height="190" rx="6" fill="#0f1e35" stroke="#0ea5e9" stroke-width="1.5"/>
+    <rect x="760" y="510" width="220" height="36" rx="6" fill="#0ea5e9" fill-opacity="0.15"/>
+    <rect x="760" y="546" width="220" height="1" fill="#0ea5e9" fill-opacity="0.4"/>
+    <text x="870" y="533" text-anchor="middle" fill="#38bdf8" font-size="13" font-weight="700">ReportGenerator</text>
+    <text x="774" y="568" fill="#94a3b8" font-size="11">- outputPath : string</text>
+    <rect x="760" y="578" width="220" height="1" fill="#1e3a5f"/>
+    <text x="774" y="598" fill="#e2e8f0" font-size="11">+ genResultReport(roll)</text>
+    <text x="774" y="616" fill="#e2e8f0" font-size="11">+ genAttendReport(roll)</text>
+    <text x="774" y="634" fill="#e2e8f0" font-size="11">+ genFeesReport(roll)</text>
+    <text x="774" y="652" fill="#e2e8f0" font-size="11">+ genClassReport(class)</text>
+    <text x="774" y="670" fill="#e2e8f0" font-size="11">+ genFullReport(roll)</text>
+  </g>
+
+  <!-- ═══════════════ RELATIONSHIPS ═══════════════ -->
+
+  <!-- SchoolClass <>── Student (composition: class has students) -->
+  <!-- diamond on SchoolClass, arrow toward Student -->
+  <line x1="390" y1="125" x2="280" y2="340" stroke="#f59e0b" stroke-width="1.5" stroke-dasharray="0" marker-start="url(#diamond)" marker-end="url(#arrow)"/>
+  <text x="300" y="240" fill="#f59e0b" font-size="10" transform="rotate(-38,300,240)">has many</text>
+
+  <!-- Student ──> Result (association) -->
+  <line x1="250" y1="330" x2="390" y2="360" stroke="#10b981" stroke-width="1.5" marker-end="url(#arrow-green)"/>
+  <text x="300" y="338" fill="#10b981" font-size="10">has</text>
+
+  <!-- Student ──> Attendance -->
+  <line x1="250" y1="400" x2="390" y2="600" stroke="#7c3aed" stroke-width="1.5" marker-end="url(#arrow-purple)"/>
+  <text x="280" y="510" fill="#a78bfa" font-size="10">tracks</text>
+
+  <!-- Student ──> Fees -->
+  <line x1="250" y1="360" x2="760" y2="350" stroke="#ef4444" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <text x="460" y="342" fill="#f87171" font-size="10">owes</text>
+
+  <!-- FileManager ──> Student (uses, dashed) -->
+  <line x1="760" y1="125" x2="610" y2="125" stroke="#64748b" stroke-width="1.5" stroke-dasharray="6,4" marker-end="url(#arrow)"/>
+  <text x="668" y="116" fill="#94a3b8" font-size="10">«uses»</text>
+
+  <!-- FileManager ──> Result -->
+  <line x1="760" y1="145" x2="610" y2="380" stroke="#64748b" stroke-width="1.5" stroke-dasharray="6,4" marker-end="url(#arrow)"/>
+
+  <!-- FileManager ──> Attendance -->
+  <line x1="760" y1="160" x2="610" y2="610" stroke="#64748b" stroke-width="1.5" stroke-dasharray="6,4" marker-end="url(#arrow)"/>
+
+  <!-- FileManager ──> Fees -->
+  <line x1="870" y1="230" x2="870" y2="260" stroke="#64748b" stroke-width="1.5" stroke-dasharray="6,4" marker-end="url(#arrow)"/>
+
+  <!-- ReportGenerator uses Result/Attendance/Fees -->
+  <line x1="760" y1="605" x2="610" y2="440" stroke="#0ea5e9" stroke-width="1.5" stroke-dasharray="6,4" marker-end="url(#arrow)"/>
+  <line x1="760" y1="630" x2="610" y2="650" stroke="#0ea5e9" stroke-width="1.5" stroke-dasharray="6,4" marker-end="url(#arrow)"/>
+  <line x1="870" y1="510" x2="870" y2="470" stroke="#0ea5e9" stroke-width="1.5" stroke-dasharray="6,4" marker-end="url(#arrow)"/>
+
+  <!-- File label badges -->
+  <rect x="32" y="236" width="96" height="20" rx="3" fill="#00d4ff" fill-opacity="0.1" stroke="#00d4ff" stroke-width="0.8"/>
+  <text x="80" y="250" text-anchor="middle" fill="#00d4ff" font-size="10">Student.cpp/.h</text>
+
+  <rect x="392" y="0" width="108" height="18" rx="3" fill="#f59e0b" fill-opacity="0.1" stroke="#f59e0b" stroke-width="0.8"/>
+  <text x="446" y="13" text-anchor="middle" fill="#f59e0b" font-size="10">Class.cpp/.h</text>
+
+  <rect x="392" y="258" width="96" height="18" rx="3" fill="#10b981" fill-opacity="0.1" stroke="#10b981" stroke-width="0.8"/>
+  <text x="440" y="271" text-anchor="middle" fill="#10b981" font-size="10">Result.cpp/.h</text>
+
+  <rect x="392" y="518" width="116" height="18" rx="3" fill="#7c3aed" fill-opacity="0.1" stroke="#7c3aed" stroke-width="0.8"/>
+  <text x="450" y="531" text-anchor="middle" fill="#a78bfa" font-size="10">Attendance.cpp/.h</text>
+
+  <rect x="762" y="236" width="88" height="18" rx="3" fill="#ef4444" fill-opacity="0.1" stroke="#ef4444" stroke-width="0.8"/>
+  <text x="806" y="249" text-anchor="middle" fill="#f87171" font-size="10">Fees.cpp/.h</text>
+
+  <rect x="762" y="0" width="136" height="18" rx="3" fill="#64748b" fill-opacity="0.1" stroke="#64748b" stroke-width="0.8"/>
+  <text x="830" y="13" text-anchor="middle" fill="#94a3b8" font-size="10">FileManager.cpp/.h</text>
+
+  <rect x="762" y="490" width="156" height="18" rx="3" fill="#0ea5e9" fill-opacity="0.1" stroke="#0ea5e9" stroke-width="0.8"/>
+  <text x="840" y="503" text-anchor="middle" fill="#38bdf8" font-size="10">ReportGenerator.cpp/.h</text>
+</svg>
+
+    </div>
+
+    <!-- LEGEND -->
+    <div class="legend">
+      <div class="legend-item">
+        <svg width="40" height="14"><line x1="2" y1="7" x2="30" y2="7" stroke="#f59e0b" stroke-width="2"/><polygon points="24,4 34,7 24,10" fill="#f59e0b"/><polygon points="2,4 7,7 2,10" fill="#f59e0b" stroke="#f59e0b"/></svg>
+        Composition (has-many)
+      </div>
+      <div class="legend-item">
+        <svg width="40" height="14"><line x1="2" y1="7" x2="30" y2="7" stroke="#10b981" stroke-width="2"/><polygon points="24,4 34,7 24,10" fill="#10b981"/></svg>
+        Association (has / owns)
+      </div>
+      <div class="legend-item">
+        <svg width="40" height="14"><line x1="2" y1="7" x2="30" y2="7" stroke="#64748b" stroke-width="2" stroke-dasharray="5,3"/><polygon points="24,4 34,7 24,10" fill="#64748b"/></svg>
+        Dependency / «uses»
+      </div>
+      <div class="legend-item">
+        <div style="width:12px;height:12px;background:#00d4ff;opacity:0.8;border-radius:2px;"></div> Student
+        <div style="width:12px;height:12px;background:#f59e0b;opacity:0.8;border-radius:2px;margin-left:8px;"></div> SchoolClass
+        <div style="width:12px;height:12px;background:#10b981;opacity:0.8;border-radius:2px;margin-left:8px;"></div> Result
+        <div style="width:12px;height:12px;background:#a78bfa;opacity:0.8;border-radius:2px;margin-left:8px;"></div> Attendance
+        <div style="width:12px;height:12px;background:#ef4444;opacity:0.8;border-radius:2px;margin-left:8px;"></div> Fees
+        <div style="width:12px;height:12px;background:#64748b;opacity:0.8;border-radius:2px;margin-left:8px;"></div> FileManager
+        <div style="width:12px;height:12px;background:#0ea5e9;opacity:0.8;border-radius:2px;margin-left:8px;"></div> ReportGenerator
+      </div>
+    </div>
+  </div>
+
+  <!-- ROLE SUMMARY TABLE -->
+  <div class="section-label">03 &nbsp; Class Responsibilities</div>
+  <div class="file-tree-card" style="padding:0; overflow:hidden;">
+    <table style="width:100%; border-collapse:collapse; font-family:'JetBrains Mono',monospace; font-size:12px;">
+      <thead>
+        <tr style="background:#0d1f36;">
+          <th style="padding:14px 20px; text-align:left; color:#00d4ff; font-weight:600; border-bottom:1px solid #1e3a5f; width:160px;">Class</th>
+          <th style="padding:14px 20px; text-align:left; color:#00d4ff; font-weight:600; border-bottom:1px solid #1e3a5f;">File Pair</th>
+          <th style="padding:14px 20px; text-align:left; color:#00d4ff; font-weight:600; border-bottom:1px solid #1e3a5f;">Responsibility</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr style="border-bottom:1px solid #1e3a5f;">
+          <td style="padding:12px 20px; color:#00d4ff;">Student</td>
+          <td style="padding:12px 20px; color:#64748b;">Student.h / .cpp</td>
+          <td style="padding:12px 20px; color:#94a3b8;">Holds student personal data. CRUD on individual student.</td>
+        </tr>
+        <tr style="border-bottom:1px solid #1e3a5f; background:#0d1625;">
+          <td style="padding:12px 20px; color:#f59e0b;">SchoolClass</td>
+          <td style="padding:12px 20px; color:#64748b;">Class.h / .cpp</td>
+          <td style="padding:12px 20px; color:#94a3b8;">Manages multiple classes (1-A, 2-B…), lists students per class.</td>
+        </tr>
+        <tr style="border-bottom:1px solid #1e3a5f;">
+          <td style="padding:12px 20px; color:#10b981;">Result</td>
+          <td style="padding:12px 20px; color:#64748b;">Result.h / .cpp</td>
+          <td style="padding:12px 20px; color:#94a3b8;">Stores marks per subject, calculates total, percentage, grade.</td>
+        </tr>
+        <tr style="border-bottom:1px solid #1e3a5f; background:#0d1625;">
+          <td style="padding:12px 20px; color:#a78bfa;">Attendance</td>
+          <td style="padding:12px 20px; color:#64748b;">Attendance.h / .cpp</td>
+          <td style="padding:12px 20px; color:#94a3b8;">Tracks present/absent days, computes attendance percentage.</td>
+        </tr>
+        <tr style="border-bottom:1px solid #1e3a5f;">
+          <td style="padding:12px 20px; color:#f87171;">Fees</td>
+          <td style="padding:12px 20px; color:#64748b;">Fees.h / .cpp</td>
+          <td style="padding:12px 20px; color:#94a3b8;">Records fees paid/pending, handles payment transactions.</td>
+        </tr>
+        <tr style="border-bottom:1px solid #1e3a5f; background:#0d1625;">
+          <td style="padding:12px 20px; color:#94a3b8;">FileManager</td>
+          <td style="padding:12px 20px; color:#64748b;">FileManager.h / .cpp</td>
+          <td style="padding:12px 20px; color:#94a3b8;">All binary file I/O: read/write/update/delete records from .dat files.</td>
+        </tr>
+        <tr>
+          <td style="padding:12px 20px; color:#38bdf8;">ReportGenerator</td>
+          <td style="padding:12px 20px; color:#64748b;">ReportGenerator.h / .cpp</td>
+          <td style="padding:12px 20px; color:#94a3b8;">Generates formatted .txt reports for result, attendance, fees, full.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+</div>
+</body>
+</html>
