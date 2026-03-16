@@ -1,5 +1,6 @@
-#include"Class.h"
-#include"Student.h"
+#include "Class.h"
+#include "Student.h"
+#include <vector>
 
 Schoolclass::Schoolclass()
 {
@@ -52,34 +53,44 @@ void Schoolclass::updateClass(string classToUpdate)
     
     ofstream tempFile("data/temp_classes.txt");
     bool found = false;
+    string line;
     
-    string clsID, clsName, clsSection, clsTeacher;
-    char delimiter;
-    
-    while(inFile >> clsID >> delimiter 
-                 >> clsName >> delimiter 
-                 >> clsSection >> delimiter 
-                 >> clsTeacher)
+    while(getline(inFile, line))
     {
-        if(clsID == classToUpdate)
-        {
-            found = true;
-            cout << "Enter updated details for class " << classToUpdate << ":" << endl;
-            
-            cout << "Enter class ID: ";
-            cin >> clsID;
-            cout << "Enter class name: ";
-            cin >> clsName;
-            cout << "Enter section: ";
-            cin >> clsSection;
-            cout << "Enter class teacher: ";
-            cin.ignore();
-            getline(cin, clsTeacher);
-            
-            cout << "Class updated successfully!" << endl;
-        }
+        if(line.empty()) continue;
         
-        tempFile << clsID << "|" << clsName << "|" << clsSection << "|" << clsTeacher << endl;
+        // Parse first field (class ID)
+        size_t pipePos = line.find('|');
+        if(pipePos != string::npos)
+        {
+            string clsID = line.substr(0, pipePos);
+            
+            if(clsID == classToUpdate)
+            {
+                found = true;
+                cout << "Enter updated details for class " << classToUpdate << ":" << endl;
+                
+                string newID, newName, newSection, newTeacher;
+                
+                cout << "Enter class ID: ";
+                cin >> newID;
+                cout << "Enter class name: ";
+                cin >> newName;
+                cout << "Enter section: ";
+                cin >> newSection;
+                cout << "Enter class teacher: ";
+                cin.ignore();
+                getline(cin, newTeacher);
+                
+                // Write updated record
+                tempFile << newID << "|" << newName << "|" << newSection << "|" << newTeacher << endl;
+                cout << "Class updated successfully!" << endl;
+            }
+            else
+            {
+                tempFile << line << endl;
+            }
+        }
     }
     
     inFile.close();
@@ -111,22 +122,21 @@ void Schoolclass::addStudentToClass(int rollNumber, string classID)
     }
     
     bool studentFound = false;
-    int roll;
-    string studName, studGender, studAddress, studPhone;
-    int studAge;
-    char delimiter;
+    string line;
     
-    while(studentFile >> roll >> delimiter 
-                     >> studName >> delimiter 
-                     >> studAge >> delimiter 
-                     >> studGender >> delimiter 
-                     >> studAddress >> delimiter 
-                     >> studPhone)
+    while(getline(studentFile, line))
     {
-        if(roll == rollNumber)
+        if(line.empty()) continue;
+        
+        size_t pipePos = line.find('|');
+        if(pipePos != string::npos)
         {
-            studentFound = true;
-            break;
+            int roll = stoi(line.substr(0, pipePos));
+            if(roll == rollNumber)
+            {
+                studentFound = true;
+                break;
+            }
         }
     }
     studentFile.close();
@@ -145,36 +155,51 @@ void Schoolclass::addStudentToClass(int rollNumber, string classID)
         return;
     }
     
-    string clsID, clsName, clsSection, clsTeacher;
-    while(classFile >> clsID >> delimiter 
-                   >> clsName >> delimiter 
-                   >> clsSection >> delimiter 
-                   >> clsTeacher)
+    bool classFound = false;
+    while(getline(classFile, line))
     {
-        if(clsID == classID)
+        if(line.empty()) continue;
+        
+        size_t pipePos = line.find('|');
+        if(pipePos != string::npos)
         {
-            // Check if student already enrolled
-            ifstream enrollFile("data/enrollments.txt");
-            if(enrollFile.is_open())
+            string clsID = line.substr(0, pipePos);
+            if(clsID == classID)
             {
-                int enrRoll;
-                string enrClassID;
-                while(enrollFile >> enrRoll >> delimiter >> enrClassID)
+                classFound = true;
+                break;
+            }
+        }
+    }
+    classFile.close();
+    
+    if(classFound)
+    {
+        // Check if student already enrolled
+        ifstream enrollFile("data/enrollments.txt");
+        if(enrollFile.is_open())
+        {
+            while(getline(enrollFile, line))
+            {
+                if(line.empty()) continue;
+                
+                size_t pipePos = line.find('|');
+                if(pipePos != string::npos)
                 {
+                    int enrRoll = stoi(line.substr(0, pipePos));
+                    string enrClassID = line.substr(pipePos + 1);
+                    
                     if(enrRoll == rollNumber && enrClassID == classID)
                     {
                         cout << "Student is already enrolled in this class!" << endl;
                         enrollFile.close();
-                        classFile.close();
                         return;
                     }
                 }
-                enrollFile.close();
             }
-            break;
+            enrollFile.close();
         }
     }
-    classFile.close();
     
     // Add student to class (create enrollment record)
     ofstream enrollFile("data/enrollments.txt", ios::app);
@@ -242,30 +267,35 @@ void Schoolclass::removeStudentFromClass(int rollNumber, string classID)
     
     ofstream tempStudent("data/temp_students.txt");
     bool studentDeleted = false;
+    string line;
     
-    string studName, studGender, studAddress, studPhone;
-    int studAge;
-    
-    while(studentFile >> roll >> delimiter 
-                     >> studName >> delimiter 
-                     >> studAge >> delimiter 
-                     >> studGender >> delimiter 
-                     >> studAddress >> delimiter 
-                     >> studPhone)
+    while(getline(studentFile, line))
     {
-        if(roll == rollNumber)
-        {
-            studentDeleted = true;
-            cout << "Student deleted from system!" << endl;
+        if(line.empty()) continue;
+        
+        vector<string> fields;
+        size_t start = 0;
+        size_t end = line.find('|');
+        
+        while(end != string::npos) {
+            fields.push_back(line.substr(start, end - start));
+            start = end + 1;
+            end = line.find('|', start);
         }
-        else
-        {
-            tempStudent << roll << "|" 
-                       << studName << "|" 
-                       << studAge << "|" 
-                       << studGender << "|" 
-                       << studAddress << "|" 
-                       << studPhone << endl;
+        fields.push_back(line.substr(start));
+        
+        if(fields.size() >= 1) {
+            int roll = stoi(fields[0]);
+            
+            if(roll == rollNumber)
+            {
+                studentDeleted = true;
+                cout << "Student deleted from system!" << endl;
+            }
+            else
+            {
+                tempStudent << line << endl;
+            }
         }
     }
     
@@ -274,11 +304,7 @@ void Schoolclass::removeStudentFromClass(int rollNumber, string classID)
     
     remove("data/students.txt");
     rename("data/temp_students.txt", "data/students.txt");
-    
-    if(!studentDeleted)
-    {
-        cout << "Student record not found in students file!" << endl;
-    }
+
 }
 
 void Schoolclass::displayClassStudents(string classID)
@@ -291,15 +317,22 @@ void Schoolclass::displayClassStudents(string classID)
     }
     
     vector<int> enrolledRolls;
-    int roll;
-    string clsID;
+    string line;
     char delimiter;
     
-    while(enrollFile >> roll >> delimiter >> clsID)
+    while(getline(enrollFile, line))
     {
-        if(clsID == classID)
-        {
-            enrolledRolls.push_back(roll);
+        if(line.empty()) continue;
+        
+        size_t pipePos = line.find('|');
+        if(pipePos != string::npos) {
+            int roll = stoi(line.substr(0, pipePos));
+            string clsID = line.substr(pipePos + 1);
+            
+            if(clsID == classID)
+            {
+                enrolledRolls.push_back(roll);
+            }
         }
     }
     enrollFile.close();
@@ -319,27 +352,36 @@ void Schoolclass::displayClassStudents(string classID)
         return;
     }
     
-    string studName, studGender, studAddress, studPhone;
-    int studAge;
-    
-    while(studentFile >> roll >> delimiter 
-                     >> studName >> delimiter 
-                     >> studAge >> delimiter 
-                     >> studGender >> delimiter 
-                     >> studAddress >> delimiter 
-                     >> studPhone)
+    while(getline(studentFile, line))
     {
-        for(size_t i = 0; i < enrolledRolls.size(); i++)
-        {
-            if(roll == enrolledRolls[i])
+        if(line.empty()) continue;
+        
+        vector<string> fields;
+        size_t start = 0;
+        size_t end = line.find('|');
+        
+        while(end != string::npos) {
+            fields.push_back(line.substr(start, end - start));
+            start = end + 1;
+            end = line.find('|', start);
+        }
+        fields.push_back(line.substr(start));
+        
+        if(fields.size() >= 7) {
+            int roll = stoi(fields[0]);
+            
+            for(size_t i = 0; i < enrolledRolls.size(); i++)
             {
-                cout << "\nRoll Number: " << roll << endl;
-                cout << "Name: " << studName << endl;
-                cout << "Age: " << studAge << endl;
-                cout << "Gender: " << studGender << endl;
-                cout << "Address: " << studAddress << endl;
-                cout << "Phone: " << studPhone << endl;
-                break;
+                if(roll == enrolledRolls[i])
+                {
+                    cout << "\nRoll Number: " << roll << endl;
+                    cout << "Name: " << fields[1] << endl;
+                    cout << "Age: " << fields[2] << endl;
+                    cout << "Gender: " << fields[3] << endl;
+                    cout << "Address: " << fields[4] << endl;
+                    cout << "Phone: " << fields[5] << endl;
+                    break;
+                }
             }
         }
     }

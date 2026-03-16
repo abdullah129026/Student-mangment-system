@@ -1,0 +1,2 @@
+1|John Smith|20|Male|10A|Main Street|5551234
+2|Jane Doe|21|Female|10B|Oak Avenue|5555678

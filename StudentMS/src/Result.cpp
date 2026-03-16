@@ -1,4 +1,5 @@
 #include "Result.h"
+#include <vector>
 
 //setters
 void Result::setRollNumber(int roll) {
@@ -85,22 +86,30 @@ void Result::addResult(int rollNumber)
     }
     
     bool studentFound = false;
-    int roll;
-    string studName, studGender, studAddress, studPhone;
-    int studAge;
-    char delimiter;
+    string line;
     
-    while(studentfile >> roll >> delimiter 
-                    >> studName >> delimiter 
-                    >> studAge >> delimiter 
-                    >> studGender >> delimiter 
-                    >> studAddress >> delimiter 
-                    >> studPhone)
+    while(getline(studentfile, line))
     {
-        if(roll == rollNumber)
-        {
-            studentFound = true;
-            break;
+        if(line.empty()) continue;
+        
+        vector<string> fields;
+        size_t start = 0;
+        size_t end = line.find('|');
+        
+        while(end != string::npos) {
+            fields.push_back(line.substr(start, end - start));
+            start = end + 1;
+            end = line.find('|', start);
+        }
+        fields.push_back(line.substr(start));
+        
+        if(fields.size() >= 1) {
+            int roll = stoi(fields[0]);
+            if(roll == rollNumber)
+            {
+                studentFound = true;
+                break;
+            }
         }
     }
     studentfile.close();
@@ -115,18 +124,19 @@ void Result::addResult(int rollNumber)
     ifstream resultfile("data/result.txt");
     if(resultfile.is_open())
     {
-        int stroll;
-        string sub;
-        int m, total;
-        float perc;
-        string grd;
-        while(resultfile >> stroll >> delimiter >> sub >> delimiter >> m >> delimiter >> total >> delimiter >> perc >> delimiter >> grd)
+        while(getline(resultfile, line))
         {
-            if(stroll == rollNumber)
-            {
-                cout << "Result already exists for roll number " << rollNumber << endl;
-                resultfile.close();
-                return;
+            if(line.empty()) continue;
+            
+            size_t pipePos = line.find('|');
+            if(pipePos != string::npos) {
+                int stroll = stoi(line.substr(0, pipePos));
+                if(stroll == rollNumber)
+                {
+                    cout << "Result already exists for roll number " << rollNumber << endl;
+                    resultfile.close();
+                    return;
+                }
             }
         }
         resultfile.close();
@@ -181,22 +191,30 @@ void Result::displayResult(int rollNumber) const
     }
     
     bool studentFound = false;
-    int roll;
-    string studName, studGender, studAddress, studPhone;
-    int studAge;
-    char delimiter;
+    string line;
     
-    while(studentfile >> roll >> delimiter 
-                    >> studName >> delimiter 
-                    >> studAge >> delimiter 
-                    >> studGender >> delimiter 
-                    >> studAddress >> delimiter 
-                    >> studPhone)
+    while(getline(studentfile, line))
     {
-        if(roll == rollNumber)
-        {
-            studentFound = true;
-            break;
+        if(line.empty()) continue;
+        
+        vector<string> fields;
+        size_t start = 0;
+        size_t end = line.find('|');
+        
+        while(end != string::npos) {
+            fields.push_back(line.substr(start, end - start));
+            start = end + 1;
+            end = line.find('|', start);
+        }
+        fields.push_back(line.substr(start));
+        
+        if(fields.size() >= 1) {
+            int roll = stoi(fields[0]);
+            if(roll == rollNumber)
+            {
+                studentFound = true;
+                break;
+            }
         }
     }
     studentfile.close();
@@ -216,25 +234,36 @@ void Result::displayResult(int rollNumber) const
     }
     
     bool resultFound = false;
-    int stroll;
-    string sub;
-    int m, total;
-    float perc;
-    string grd;
     
     cout << "\n==== Result for Roll Number " << rollNumber << " ====" << endl;
     
-    while(resultfile >> stroll >> delimiter >> sub >> delimiter >> m >> delimiter >> total >> delimiter >> perc >> delimiter >> grd)
+    while(getline(resultfile, line))
     {
-        if(stroll == rollNumber)
-        {
-            resultFound = true;
-            cout << "\nSubject: " << sub << endl;
-            cout << "Marks Obtained: " << m << endl;
-            cout << "Total Marks: " << total << endl;
-            cout << "Percentage: " << perc << "%" << endl;
-            cout << "Grade: " << grd << endl;
-            cout << "-----------------" << endl;
+        if(line.empty()) continue;
+
+        vector<string> fields;
+        size_t start = 0;
+        size_t end = line.find('|');
+        
+        while(end != string::npos) {
+            fields.push_back(line.substr(start, end - start));
+            start = end + 1;
+            end = line.find('|', start);
+        }
+        fields.push_back(line.substr(start));
+        
+        if(fields.size() >= 6) {
+            int stroll = stoi(fields[0]);
+            if(stroll == rollNumber)
+            {
+                resultFound = true;
+                cout << "\nSubject: " << fields[1] << endl;
+                cout << "Marks Obtained: " << fields[2] << endl;
+                cout << "Total Marks: " << fields[3] << endl;
+                cout << "Percentage: " << fields[4] << "%" << endl;
+                cout << "Grade: " << fields[5] << endl;
+                cout << "-----------------" << endl;
+            }
         }
     }
     
@@ -259,22 +288,30 @@ void Result::updateResult(int rollNumber)
     }
     
     bool studentFound = false;
-    int roll;
-    string studName, studGender, studAddress, studPhone;
-    int studAge;
-    char delimiter;
+    string line;
     
-    while(studentfile >> roll >> delimiter 
-                    >> studName >> delimiter 
-                    >> studAge >> delimiter 
-                    >> studGender >> delimiter 
-                    >> studAddress >> delimiter 
-                    >> studPhone)
+    while(getline(studentfile, line))
     {
-        if(roll == rollNumber)
-        {
-            studentFound = true;
-            break;
+        if(line.empty()) continue;
+        
+        vector<string> fields;
+        size_t start = 0;
+        size_t end = line.find('|');
+        
+        while(end != string::npos) {
+            fields.push_back(line.substr(start, end - start));
+            start = end + 1;
+            end = line.find('|', start);
+        }
+        fields.push_back(line.substr(start));
+        
+        if(fields.size() >= 1) {
+            int roll = stoi(fields[0]);
+            if(roll == rollNumber)
+            {
+                studentFound = true;
+                break;
+            }
         }
     }
     studentfile.close();
@@ -294,18 +331,29 @@ void Result::updateResult(int rollNumber)
     }
     
     bool resultExists = false;
-    int stroll;
-    string sub;
-    int m, total;
-    float perc;
-    string grd;
     
-    while(resultfile >> stroll >> delimiter >> sub >> delimiter >> m >> delimiter >> total >> delimiter >> perc >> delimiter >> grd)
+    while(getline(resultfile, line))
     {
-        if(stroll == rollNumber)
-        {
-            resultExists = true;
-            break;
+        if(line.empty()) continue;
+        
+        vector<string> fields;
+        size_t start = 0;
+        size_t end = line.find('|');
+        
+        while(end != string::npos) {
+            fields.push_back(line.substr(start, end - start));
+            start = end + 1;
+            end = line.find('|', start);
+        }
+        fields.push_back(line.substr(start));
+        
+        if(fields.size() >= 1) {
+            int stroll = stoi(fields[0]);
+            if(stroll == rollNumber)
+            {
+                resultExists = true;
+                break;
+            }
         }
     }
     resultfile.close();
@@ -344,21 +392,37 @@ void Result::updateResult(int rollNumber)
     
     ofstream tempFile("data/temp_result.txt");
     
-    while(inFile >> stroll >> delimiter >> sub >> delimiter >> m >> delimiter >> total >> delimiter >> perc >> delimiter >> grd)
+    while(getline(inFile, line))
     {
-        if(stroll == rollNumber)
-        {
-            tempFile << rollNumber << "|" 
-                     << subject << "|" 
-                     << marks << "|" 
-                     << totalMarks << "|" 
-                     << percentage << "|" 
-                     << grade << endl;
-            cout << "Result updated successfully!" << endl;
+        if(line.empty()) continue;
+        
+        vector<string> fields;
+        size_t start = 0;
+        size_t end = line.find('|');
+        
+        while(end != string::npos) {
+            fields.push_back(line.substr(start, end - start));
+            start = end + 1;
+            end = line.find('|', start);
         }
-        else
-        {
-            tempFile << stroll << "|" << sub << "|" << m << "|" << total << "|" << perc << "|" << grd << endl;
+        fields.push_back(line.substr(start));
+        
+        if(fields.size() >= 6) {
+            int stroll = stoi(fields[0]);
+            if(stroll == rollNumber)
+            {
+                tempFile << rollNumber << "|" 
+                         << subject << "|" 
+                         << marks << "|" 
+                         << totalMarks << "|" 
+                         << percentage << "|" 
+                         << grade << endl;
+                cout << "Result updated successfully!" << endl;
+            }
+            else
+            {
+                tempFile << line << endl;
+            }
         }
     }
     

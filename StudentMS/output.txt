@@ -1,0 +1,12 @@
+
+========================================
+     STUDENT MANAGEMENT SYSTEM (SMS)    
+========================================
+1. Student Management
+2. Attendance Management
+3. Result Management
+4. Fees Management
+5. Class Management
+6. Generate Reports
+0. Exit
+Enter your choice: 

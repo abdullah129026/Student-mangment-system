@@ -1,4 +1,6 @@
 #include"Student.h"
+#include <sstream>
+#include <vector>
 
 Student::Student() {
     rollNumber = 0;
@@ -120,34 +122,27 @@ void Student::deleteStudent(int rollToDelete)
     
     ofstream tempFile("data/temp_students.txt");
     bool found = false;
+    string line;
     
-    int roll;
-    string studName, studGender, studClassID, studAddress, studPhone;
-    int studAge;
-    char delimiter;
-    
-    while(inFile >> roll >> delimiter 
-                  >> studName >> delimiter 
-                  >> studAge >> delimiter 
-                  >> studGender >> delimiter 
-                  >> studClassID >> delimiter 
-                  >> studAddress >> delimiter 
-                  >> studPhone)
+    while(getline(inFile, line))
     {
-        if(roll == rollToDelete)
+        if(line.empty()) continue;
+        
+        // Parse the first field (roll number)
+        size_t pipePos = line.find('|');
+        if(pipePos != string::npos)
         {
-            found = true;
-            cout << "Student deleted successfully!" << endl;
-        }
-        else
-        {
-            tempFile << roll << "|" 
-                     << studName << "|" 
-                     << studAge << "|" 
-                     << studGender << "|" 
-                     << studClassID << "|" 
-                     << studAddress << "|" 
-                     << studPhone << endl;
+            int roll = stoi(line.substr(0, pipePos));
+            
+            if(roll == rollToDelete)
+            {
+                found = true;
+                cout << "Student deleted successfully!" << endl;
+            }
+            else
+            {
+                tempFile << line << endl;
+            }
         }
     }
     
@@ -170,33 +165,39 @@ void Student::searchStudent(int roll)
     }
 
     bool found = false;
+    string line;
     
-    int storedRoll;
-    string studName, studGender, studClassID, studAddress, studPhone;
-    int studAge;
-    char delimiter;
-
-    while(file >> storedRoll >> delimiter 
-                 >> studName >> delimiter 
-                 >> studAge >> delimiter 
-                 >> studGender >> delimiter 
-                 >> studClassID >> delimiter 
-                 >> studAddress >> delimiter 
-                 >> studPhone)
+    while(getline(file, line))
     {
-        if(storedRoll == roll )
-        {
-            cout << "\nStudent Found\n";
-            cout << "Roll Number: " << storedRoll << endl;
-            cout << "Name: " << studName << endl;
-            cout << "Age: " << studAge << endl;
-            cout << "Gender: " << studGender << endl;
-            cout << "Class ID: " << studClassID << endl;
-            cout << "Address: " << studAddress << endl;
-            cout << "Phone: " << studPhone << endl;
-
-            found = true;
-            break;
+        if(line.empty()) continue;
+        
+        // Extract fields manually by splitting on |
+        vector<string> fields;
+        size_t start = 0;
+        size_t end = line.find('|');
+        
+        while(end != string::npos) {
+            fields.push_back(line.substr(start, end - start));
+            start = end + 1;
+            end = line.find('|', start);
+        }
+        fields.push_back(line.substr(start)); // Add last field
+        
+        // Check if we have all 7 fields and roll matches
+        if(fields.size() >= 7) {
+            int storedRoll = stoi(fields[0]);
+            if(storedRoll == roll) {
+                cout << "\nStudent Found\n";
+                cout << "Roll Number: " << fields[0] << endl;
+                cout << "Name: " << fields[1] << endl;
+                cout << "Age: " << fields[2] << endl;
+                cout << "Gender: " << fields[3] << endl;
+                cout << "Class ID: " << fields[4] << endl;
+                cout << "Address: " << fields[5] << endl;
+                cout << "Phone: " << fields[6] << endl;
+                found = true;
+                break;
+            }
         }
     }
 
@@ -218,57 +219,67 @@ void Student::updateStudent(int rollToUpdate)
     
     ofstream tempFile("data/temp_students.txt");
     bool found = false;
+    string line;
     
-    int roll;
-    string studName, studGender, studClassID, studAddress, studPhone;
-    int studAge;
-    char delimiter;
-    
-    while(inFile >> roll >> delimiter 
-                  >> studName >> delimiter 
-                  >> studAge >> delimiter 
-                  >> studGender >> delimiter 
-                  >> studClassID >> delimiter 
-                  >> studAddress >> delimiter 
-                  >> studPhone)
+    while(getline(inFile, line))
     {
-        if(roll == rollToUpdate)
+        if(line.empty()) continue;
+        
+        // Parse the line
+        size_t pipePos = line.find('|');
+        if(pipePos != string::npos)
         {
-            found = true;
-            cout << "Enter new details for roll number " << roll << ":" << endl;
+            int roll = stoi(line.substr(0, pipePos));
             
-            cout << "Enter name: ";
-            cin.ignore();
-            getline(cin, studName);
-            
-            cout << "Enter age: ";
-            cin >> studAge;
-            cin.ignore();
-            
-            cout << "Enter gender: ";
-            getline(cin, studGender);
-            cout << "Enter class ID: ";
-            getline(cin, studClassID); 
-            cout << "Enter address: ";
-            getline(cin, studAddress);
-            cout << "Enter phone number: ";
-            getline(cin, studPhone);
-            cout << "Student updated successfully!" << endl;
+            if(roll == rollToUpdate)
+            {
+                found = true;
+                cout << "Enter new details for roll number " << roll << ":" << endl;
+                
+                // Get new values
+                string newName, newGender, newClassID, newAddress, newPhone;
+                int newAge;
+                
+                cout << "Enter name: ";
+                cin.ignore();
+                getline(cin, newName);
+                
+                cout << "Enter age: ";
+                cin >> newAge;
+                cin.ignore();
+                
+                cout << "Enter gender: ";
+                getline(cin, newGender);
+                
+                cout << "Enter class ID: ";
+                getline(cin, newClassID);
+                
+                cout << "Enter address: ";
+                getline(cin, newAddress);
+                
+                cout << "Enter phone number: ";
+                getline(cin, newPhone);
+                
+                // Write updated record
+                tempFile << roll << "|" << newName << "|" << newAge << "|" 
+                         << newGender << "|" << newClassID << "|" << newAddress << "|" 
+                         << newPhone << endl;
+                
+                cout << "Student updated successfully!" << endl;
+            }
+            else
+            {
+                tempFile << line << endl;
+            }
         }
-
-
-        tempFile << roll << "|" 
-                 << studName << "|" 
-                 << studAge << "|" 
-                 << studGender << "|" 
-                 << studClassID << "|" 
-                 << studAddress << "|" 
-                 << studPhone << endl;
     }
+    
     inFile.close();
     tempFile.close();
+    
     remove("data/students.txt");
     rename("data/temp_students.txt", "data/students.txt");
+    
     if(!found)
         cout << "Student not found!" << endl;
 }

@@ -2,6 +2,7 @@
 #include <fstream>
 #include <string>
 #include <iostream>
+#include <vector>
 
 using namespace std;
 
@@ -68,46 +69,54 @@ void Fees::enterfeerecord(int rollNumber)
     }
     
     bool studentFound = false;
-    int roll;
-    string studName, studGender, studAddress, studPhone;
-    int studAge;
-    char delimiter;
+    string line;
     
-    while(studentFile >> roll >> delimiter 
-                     >> studName >> delimiter 
-                     >> studAge >> delimiter 
-                     >> studGender >> delimiter 
-                     >> studAddress >> delimiter 
-                     >> studPhone)
+    while(getline(studentFile, line))
     {
-        if(roll == rollNumber)
-        {
-            studentFound = true;
-            break;
+        if(line.empty()) continue;
+        vector<string> fields;
+        size_t start = 0;
+        size_t end = line.find('|');
+        while(end != string::npos) {
+            fields.push_back(line.substr(start, end - start));
+            start = end + 1;
+            end = line.find('|', start);
+        }
+        fields.push_back(line.substr(start));
+        if(fields.size() >= 1) {
+            int roll = stoi(fields[0]);
+            if(roll == rollNumber)
+            {
+                studentFound = true;
+                break;
+            }
         }
     }
     studentFile.close();
-    
     if(!studentFound)
     {
         cout << "Student with roll number " << rollNumber << " not found!" << endl;
         return;
     }
     
+    
     //fee record already exists
     ifstream feesFile("data/fees.txt");
     if(feesFile.is_open())
     {
-        int enrRoll;
-        float enrTotal, enrPaid, enrRemaining;
-        string enrDate;
-        while(feesFile >> enrRoll >> delimiter >> enrTotal >> delimiter >> enrPaid >> delimiter >> enrRemaining >> delimiter >> enrDate)
+        while(getline(feesFile, line))
         {
-            if(enrRoll == rollNumber)
-            {
-                cout << "Fee record already exists for this student!" << endl;
-                feesFile.close();
-                return;
+            if(line.empty()) continue;
+            
+            size_t pipePos = line.find('|');
+            if(pipePos != string::npos) {
+                int enrRoll = stoi(line.substr(0, pipePos));
+                if(enrRoll == rollNumber)
+                {
+                    cout << "Fee record already exists for this student!" << endl;
+                    feesFile.close();
+                    return;
+                }
             }
         }
         feesFile.close();
@@ -136,21 +145,32 @@ void Fees::displayfeerecord()
         return;
     }
     
-    int roll;
-    float total, paid, remaining;
-    string date;
-    char delimiter;
-    
+    string line;
     cout << "\n==== Fee Records ======" << endl;
     
-    while(file >> roll >> delimiter >> total >> delimiter >> paid >> delimiter >> remaining >> delimiter >> date)
+    while(getline(file, line))
     {
-        cout << "\nRoll Number: " << roll << endl;
-        cout << "Total Fees: " << total << endl;
-        cout << "Paid Fees: " << paid << endl;
-        cout << "Remaining Fees: " << remaining << endl;
-        cout << "Payment Date: " << date << endl;
-        cout << "--------------------" << endl;
+        if(line.empty()) continue;
+        
+        vector<string> fields;
+        size_t start = 0;
+        size_t end = line.find('|');
+        
+        while(end != string::npos) {
+            fields.push_back(line.substr(start, end - start));
+            start = end + 1;
+            end = line.find('|', start);
+        }
+        fields.push_back(line.substr(start));
+        
+        if(fields.size() >= 5) {
+            cout << "\nRoll Number: " << fields[0] << endl;
+            cout << "Total Fees: " << fields[1] << endl;
+            cout << "Paid Fees: " << fields[2] << endl;
+            cout << "Remaining Fees: " << fields[3] << endl;
+            cout << "Payment Date: " << fields[4] << endl;
+            cout << "--------------------" << endl;
+        }
     }
     
     file.close();
@@ -167,39 +187,56 @@ void Fees::payfees(int rollNumber)
     
     ofstream tempFile("data/temp_fees.txt");
     bool found = false;
+    string line;
     
-    int roll;
-    float total, paid, remaining;
-    string date;
-    char delimiter;
-    
-    while(inFile >> roll >> delimiter >> total >> delimiter >> paid >> delimiter >> remaining >> delimiter >> date)
+    while(getline(inFile, line))
     {
-        if(roll == rollNumber)
-        {
-            found = true;
-            cout << "Enter amount to pay: ";
-            float paymentAmount;
-            cin >> paymentAmount;
+        if(line.empty()) continue;
+        
+        vector<string> fields;
+        size_t start = 0;
+        size_t end = line.find('|');
+        
+        while(end != string::npos) {
+            fields.push_back(line.substr(start, end - start));
+            start = end + 1;
+            end = line.find('|', start);
+        }
+        fields.push_back(line.substr(start));
+        
+        if(fields.size() >= 5) {
+            int roll = stoi(fields[0]);
+            float total = stof(fields[1]);
+            float paid = stof(fields[2]);
+            float remaining = stof(fields[3]);
+            string date = fields[4];
             
-            paid += paymentAmount;
-            remaining = total - paid;
-            
-            if(remaining < 0)
+            if(roll == rollNumber)
             {
-                cout << "Warning: Payment exceeds remaining fees!" << endl;
-                remaining = 0;
+                found = true;
+                cout << "Enter amount to pay: ";
+                float paymentAmount;
+                cin >> paymentAmount;
+                
+                paid += paymentAmount;
+                remaining = total - paid;
+                
+                if(remaining < 0)
+                {
+                    cout << "Warning: Payment exceeds remaining fees!" << endl;
+                    remaining = 0;
+                }
+                
+                cout << "Enter new payment date: ";
+                cin.ignore();
+                getline(cin, date);
+                
+                cout << "Payment recorded successfully!" << endl;
+                cout << "Remaining fees: " << remaining << endl;
             }
             
-            cout << "Enter new payment date: ";
-            cin.ignore();
-            getline(cin, date);
-            
-            cout << "Payment recorded successfully!" << endl;
-            cout << "Remaining fees: " << remaining << endl;
+            tempFile << roll << "|" << total << "|" << paid << "|" << remaining << "|" << date << endl;
         }
-        
-        tempFile << roll << "|" << total << "|" << paid << "|" << remaining << "|" << date << endl;
     }
     
     inFile.close();
@@ -223,33 +260,53 @@ void Fees::updatefeerecord(int rollNumber)
     
     ofstream tempFile("data/temp_fees.txt");
     bool found = false;
+    string line;
     
-    int roll;
-    float total, paid, remaining;
-    string date;
-    char delimiter;
-    
-    while(inFile >> roll >> delimiter >> total >> delimiter >> paid >> delimiter >> remaining >> delimiter >> date)
+    while(getline(inFile, line))
     {
-        if(roll == rollNumber)
-        {
-            found = true;
-            cout << "Enter updated total fees: ";
-            cin >> total;
-            
-            cout << "Enter updated paid fees: ";
-            cin >> paid;
-            
-            cout << "Enter payment date: ";
-            cin.ignore();
-            getline(cin, date);
-            
-            remaining = total - paid;
-            
-            cout << "Fee record updated successfully!" << endl;
-        }
+        if(line.empty()) continue;
         
-        tempFile << roll << "|" << total << "|" << paid << "|" << remaining << "|" << date << endl;
+        vector<string> fields;
+        size_t start = 0;
+        size_t end = line.find('|');
+        
+        while(end != string::npos) {
+            fields.push_back(line.substr(start, end - start));
+            start = end + 1;
+            end = line.find('|', start);
+        }
+        fields.push_back(line.substr(start));
+        
+        if(fields.size() >= 5) {
+            int roll = stoi(fields[0]);
+            float total = stof(fields[1]);
+            float paid = stof(fields[2]);
+            string date = fields[4];
+            
+            if(roll == rollNumber)
+            {
+                found = true;
+                cout << "Enter updated total fees: ";
+                cin >> total;
+                
+                cout << "Enter updated paid fees: ";
+                cin >> paid;
+                
+                cout << "Enter payment date: ";
+                cin.ignore();
+                getline(cin, date);
+                
+                float remaining = total - paid;
+                
+                tempFile << roll << "|" << total << "|" << paid << "|" << remaining << "|" << date << endl;
+                
+                cout << "Fee record updated successfully!" << endl;
+            }
+            else
+            {
+                tempFile << line << endl;
+            }
+        }
     }
     
     inFile.close();
@@ -296,22 +353,35 @@ void Fees::deletefeerecord(int rollToDelete)
     
     ofstream tempFile("data/temp_fees.txt");
     bool found = false;
+    string line;
     
-    int roll;
-    float total, paid, remaining;
-    string date;
-    char delimiter;
-    
-    while(inFile >> roll >> delimiter >> total >> delimiter >> paid >> delimiter >> remaining >> delimiter >> date)
+    while(getline(inFile, line))
     {
-        if(roll == rollToDelete)
-        {
-            found = true;
-            cout << "Fee record deleted successfully!" << endl;
+        if(line.empty()) continue;
+        
+        vector<string> fields;
+        size_t start = 0;
+        size_t end = line.find('|');
+        
+        while(end != string::npos) {
+            fields.push_back(line.substr(start, end - start));
+            start = end + 1;
+            end = line.find('|', start);
         }
-        else
-        {
-            tempFile << roll << "|" << total << "|" << paid << "|" << remaining << "|" << date << endl;
+        fields.push_back(line.substr(start));
+        
+        if(fields.size() >= 5) {
+            int roll = stoi(fields[0]);
+            
+            if(roll == rollToDelete)
+            {
+                found = true;
+                cout << "Fee record deleted successfully!" << endl;
+            }
+            else
+            {
+                tempFile << line << endl;
+            }
         }
     }
     

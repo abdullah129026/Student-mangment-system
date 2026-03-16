@@ -1,7 +1,7 @@
 #include"Attendance.h"
 #include<iostream>  
 #include<fstream>
-
+#include<vector>
 
 Attendance::Attendance() {
     rollNumber= 0;
@@ -45,22 +45,29 @@ void Attendance::markAttendance(int rollNumber)
     }
     
     bool studentFound = false;
-    int roll;
-    string studName, studGender, studAddress, studPhone;
-    int studAge;
-    char delimiter;
+    string line;
     
-    while(studentFile >> roll >> delimiter 
-                     >> studName >> delimiter 
-                     >> studAge >> delimiter 
-                     >> studGender >> delimiter 
-                     >> studAddress >> delimiter 
-                     >> studPhone)
+    while(getline(studentFile, line))
     {
-        if(roll == rollNumber)
-        {
-            studentFound = true;
-            break;
+        if(line.empty()) continue;
+        
+        vector<string> fields;
+        size_t start = 0;
+        size_t end = line.find('|');
+        
+        while(end != string::npos) {
+            fields.push_back(line.substr(start, end - start));
+            start = end + 1;
+            end = line.find('|', start);
+        }
+        fields.push_back(line.substr(start));
+        
+        if(fields.size() >= 1) {
+            int roll = stoi(fields[0]);
+            if(roll == rollNumber) {
+                studentFound = true;
+                break;
+            }
         }
     }
     studentFile.close();
@@ -75,15 +82,19 @@ void Attendance::markAttendance(int rollNumber)
     ifstream attnFile("data/attendance.txt");
     if(attnFile.is_open())
     {
-        int enrRoll, enrTotal, enrAttended;
-        float enrPercentage;
-        while(attnFile >> enrRoll >> delimiter >> enrTotal >> delimiter >> enrAttended >> delimiter >> enrPercentage)
+        while(getline(attnFile, line))
         {
-            if(enrRoll == rollNumber)
-            {
-                cout << "Attendance record already exists for this student!" << endl;
-                attnFile.close();
-                return;
+            if(line.empty()) continue;
+            
+            size_t pipePos = line.find('|');
+            if(pipePos != string::npos) {
+                int enrRoll = stoi(line.substr(0, pipePos));
+                if(enrRoll == rollNumber)
+                {
+                    cout << "Attendance record already exists for this student!" << endl;
+                    attnFile.close();
+                    return;
+                }
             }
         }
         attnFile.close();
@@ -113,32 +124,48 @@ void Attendance::updateAttendance(int rollNumber)
     
     ofstream tempFile("data/temp_attendance.txt");
     bool found = false;
+    string line;
     
-    int roll, total, attended;
-    float percentage;
-    char delimiter;
-    
-    while(inFile >> roll >> delimiter >> total >> delimiter >> attended >> delimiter >> percentage)
+    while(getline(inFile, line))
     {
-        if(roll == rollNumber)
-        {
-            found = true;
-            cout << "Enter updated classes attended: ";
-            cin >> attended;
-            
-            cout << "Enter updated total classes: ";
-            cin >> total;
-            
-            setRollNumber(rollNumber);
-            setTotalClasses(total);
-            setClassesAttended(attended);
-            calculateAttendance();
-            
-            cout << "Attendance updated successfully!" << endl;
+        if(line.empty()) continue;
+        
+        vector<string> fields;
+        size_t start = 0;
+        size_t end = line.find('|');
+        
+        while(end != string::npos) {
+            fields.push_back(line.substr(start, end - start));
+            start = end + 1;
+            end = line.find('|', start);
         }
-        else
-        {
-            tempFile << roll << "|" << total << "|" << attended << "|" << percentage << endl;
+        fields.push_back(line.substr(start));
+        
+        if(fields.size() >= 4) {
+            int roll = stoi(fields[0]);
+            int total = stoi(fields[1]);
+            int attended = stoi(fields[2]);
+            
+            if(roll == rollNumber)
+            {
+                found = true;
+                cout << "Enter updated classes attended: ";
+                cin >> attended;
+                
+                cout << "Enter updated total classes: ";
+                cin >> total;
+                
+                setRollNumber(rollNumber);
+                setTotalClasses(total);
+                setClassesAttended(attended);
+                calculateAttendance();
+                
+                cout << "Attendance updated successfully!" << endl;
+            }
+            else
+            {
+                tempFile << line << endl;
+            }
         }
     }
     
