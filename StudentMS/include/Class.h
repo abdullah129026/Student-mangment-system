@@ -38,6 +38,6 @@ class Schoolclass
     string getClassName() const;
     string getSection() const;
     string getClassTeacher() const;
-}
+};
 
 #endif

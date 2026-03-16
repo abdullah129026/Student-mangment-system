@@ -1,3 +1,61 @@
+#include "Fees.h"
+#include <fstream>
+#include <string>
+#include <iostream>
+
+using namespace std;
+
+//Constructor
+Fees::Fees() {
+    rollNumber = 0;
+    totalFees = 0.0;
+    paidFees = 0.0;
+    remainingFees = 0.0;
+    paymentdate = "";
+}
+
+//Setters
+void Fees::setRollNumber(int rollNumber) {
+    this->rollNumber = rollNumber;
+}
+
+void Fees::setTotalFees(float totalFees) {
+    this->totalFees = totalFees;
+}
+
+void Fees::setPaidFees(float paidFees) {
+    this->paidFees = paidFees;
+}
+
+void Fees::setRemainingFees(float remainingFees) {
+    this->remainingFees = remainingFees;
+}
+
+void Fees::setPaymentdate(string paymentdate) {
+    this->paymentdate = paymentdate;
+}
+
+//Getters
+int Fees::getRollNumber() const {
+    return rollNumber;
+}
+
+float Fees::getTotalFees() const {
+    return totalFees;
+}
+
+float Fees::getPaidFees() const {
+    return paidFees;
+}
+
+float Fees::getRemainingFees() const {
+    return remainingFees;
+}
+
+string Fees::getPaymentdate() const {
+    return paymentdate;
+}
+
 //member functions
 void Fees::enterfeerecord(int rollNumber)
 {

@@ -32,12 +32,12 @@ class Result {
 
     //Getters
     int getRollNumber() const;
-    void getSubject() const;
+    string getSubject() const;
     int getMarks() const;
     int getTotalSubjects() const;
     int getTotalMarks() const;
-    void getGrade() const;
-    void getPercentage() const;
+    string getGrade() const;
+    float getPercentage() const;
 
     //  methods
 
@@ -46,6 +46,6 @@ class Result {
     void updateResult(int rollNumber);
     void calculatePercentage();
     void calculateGrade();
-}
+};
 
 #endif

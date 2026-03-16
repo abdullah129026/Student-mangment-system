@@ -1,0 +1,16 @@
+# Build artifacts
+StudentMS/obj/
+StudentMS/*.exe
+StudentMS/*.o
+StudentMS/preprocessed.txt
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~

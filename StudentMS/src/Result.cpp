@@ -1,15 +1,5 @@
 #include "Result.h"
 
-Result::Result() {
-    rollNumber = 0;
-    subject = "";
-    totalsubjects = 0;
-    marks = 0;
-    totalMarks = 0;
-    grade = "";
-    percentage = 0.0;
-}
-
 //setters
 void Result::setRollNumber(int roll) {
     rollNumber = roll;
@@ -180,7 +170,7 @@ void Result::addResult(int rollNumber)
 
 //show result
 
-void Result::displayResult(int rollNumber)
+void Result::displayResult(int rollNumber) const
 {
     //verify student exists
     ifstream studentfile("data/students.txt");
