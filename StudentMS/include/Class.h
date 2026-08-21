@@ -6,7 +6,6 @@
 #include<fstream>
 #include<vector>
 #include"Student.h"
-
 using namespace std;
 
 class Schoolclass
