@@ -3,6 +3,7 @@
 void ReportGenerator::generateStudentReport(const Student& student) const
 {
     cout << "\n==== Student Report ====" << endl;
+
     
     ofstream file("reports/student_report.txt", ios::app);
     if(file.is_open())
@@ -46,6 +47,8 @@ void ReportGenerator::generateAttendanceReport(const Attendance& attendance) con
         cout << "Unable to create report file!" << endl;
     }
 }
+
+
 
 void ReportGenerator::generateResultReport(const Result& result) const
 {
@@ -93,6 +96,7 @@ void ReportGenerator::generateFeesReport(const Fees& fees) const
         cout << "Unable to create report file!" << endl;
     }
 }
+
 
 void ReportGenerator::generateFullReport(const Student& student,
                                         const Result& result,
